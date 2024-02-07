@@ -19,8 +19,8 @@ def test_delete():
     f.add(Proxy("http://1.1.1.1"))
     f.add(Proxy("http://2.2.2.2"))
     try:
-        with f.next():
-            assert f.local.proxy.url == "http://1.1.1.1"
+        with f.next() as p:
+            assert p.url == "http://1.1.1.1"
             raise Exception("test")
     except:
         pass

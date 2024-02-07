@@ -8,7 +8,6 @@ class ProxyFactory:
     def __init__(self):
         self.proxies: typing.List[Proxy] = []
         self.index = 0
-        self.local = threading.local()
         self.lock = threading.RLock()
 
     def load_from_file(self, filename):
@@ -34,15 +33,11 @@ class ProxyFactory:
             self.index += 1
             return proxy
 
-    def start(self, proxy):
-        self.local.proxy = proxy
-        return proxy
-
-    def proxy_error(self, exc_type, exc_val, exc_tb):
+    def _proxy_error(self, proxy, exc_type, exc_val, exc_tb):
         with self.lock:
             if exc_type is None:
-                self.local.proxy.success_count += 1
+                proxy.success_count += 1
             else:
-                self.local.proxy.failed_count += 1
-                if self.local.proxy.should_be_deleted():
-                    self.proxies.remove(self.local.proxy)
+                proxy.failed_count += 1
+                if proxy.should_be_deleted():
+                    self.proxies.remove(proxy)

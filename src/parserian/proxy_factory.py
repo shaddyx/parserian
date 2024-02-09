@@ -1,14 +1,17 @@
 import threading
 import typing
 
+import parserian.proxy_rotation_strategy as proxy_strategy
 from parserian.proxy import Proxy
 
 
 class ProxyFactory:
+
     def __init__(self):
         self.proxies: typing.List[Proxy] = []
         self.index = 0
         self.lock = threading.RLock()
+        self.strategy = proxy_strategy.RoundRobinProxyStrategy()
 
     def load_from_file(self, filename):
         with open(filename, "r") as f:
@@ -27,11 +30,7 @@ class ProxyFactory:
 
     def next(self):
         with self.lock:
-            if self.index >= len(self.proxies):
-                self.index = 0
-            proxy = self.proxies[self.index]
-            self.index += 1
-            return proxy
+            return self.strategy.next(self)
 
     def _proxy_error(self, proxy, exc_type, exc_val, exc_tb):
         with self.lock:

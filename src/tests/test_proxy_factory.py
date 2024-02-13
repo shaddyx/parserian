@@ -1,10 +1,12 @@
 import os
+import time
 
 from parserian import proxy_rotation_strategy as proxy_strategy
 from parserian.proxy import Proxy
 from parserian.proxy_factory import ProxyFactory
 
 curdir = os.path.dirname(os.path.abspath(__file__))
+
 
 def test_add_then_next():
     f = ProxyFactory()
@@ -16,6 +18,28 @@ def test_add_then_next():
         assert p.url == "http://2.2.2.2"
     with f.next() as p:
         assert p.url == "http://1.1.1.1"
+
+
+def test_round_robin_with_tracking():
+    f = ProxyFactory()
+    f.strategy = proxy_strategy.RoundRobinProxyStrategy(track_usage=True, cool_down=0.1)
+    f.add(Proxy("http://1.1.1.1"))
+    f.add(Proxy("http://2.2.2.2"))
+
+    with f.next() as p:
+        assert p.url == "http://1.1.1.1"
+    with f.next() as p:
+        assert p.url == "http://2.2.2.2"
+    time.sleep(0.1)
+    with f.next() as p:
+        assert p.url == "http://1.1.1.1"
+    with f.next() as p:
+        assert p.url == "http://2.2.2.2"
+    try:
+        with f.next() as p:
+            assert False, "Should be an error"
+    except proxy_strategy.ProxyNotAvailableException:
+        pass
 
 
 def test_delete():
@@ -39,6 +63,7 @@ def test_load_from_file():
     assert f.proxies[1].url == 'socks5://test.domain.com:3123'
     assert f.proxies[2].url == 'socks4://test.domain1.com:3127'
 
+
 def test_random_strategy():
     f = ProxyFactory()
     f.add(Proxy("http://1.1.1.1"))
@@ -61,8 +86,18 @@ def test_random_strategy():
     assert len(list(set(elements))) == 3
 
 
+def test_random_strategy_cooldown():
+    f = ProxyFactory()
+    f.strategy = proxy_strategy.RandomProxyStrategy(cool_down=0.1, track_usage=True)
+    f.add(Proxy("http://1.1.1.1"))
+    f.add(Proxy("http://2.2.2.2"))
+    with f.next() as p:
+        assert p.url in ["http://1.1.1.1", "http://2.2.2.2"]
+    with f.next() as p:
+        assert p.url in ["http://1.1.1.1", "http://2.2.2.2"]
 
-
-
-
-
+    try:
+        with f.next() as p:
+            assert False, "Should be an error"
+    except proxy_strategy.ProxyNotAvailableException:
+        pass

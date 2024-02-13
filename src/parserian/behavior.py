@@ -11,4 +11,3 @@ class Behavior:
 
     def get_random_delay(self, min_value=1, max_value=5):
         return random.uniform(min_value, max_value)
-

@@ -7,6 +7,7 @@ class Proxy:
         self.failed_count = 0
         self.success_count = 0
         self.last_used_time = 0
+        self.acquired = False
         self.last_error_time = 0
         self.lock = threading.RLock()
         self.factory = None

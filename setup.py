@@ -13,6 +13,8 @@ setup(
     install_requires=[
                       'pytest',
                       'cachetools',
+                      'beautifulsoup4',
+                      'requests',
                       ],
     package_data={"": ["*.json"]},
     # *strongly* suggested for sharing

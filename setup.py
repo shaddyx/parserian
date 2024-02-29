@@ -18,7 +18,7 @@ setup(
                       ],
     package_data={"": ["*.json"]},
     # *strongly* suggested for sharing
-    version='0.07',
+    version='0.08',
     # The license can be anything you like
     license='MIT',
     description='A bunch of tools to help developing parsers',

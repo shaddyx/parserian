@@ -2,13 +2,13 @@ import threading
 import time
 import typing
 
-import parserian.proxy_rotation_strategy as proxy_strategy
 from parserian.proxy import Proxy
 
 
 class ProxyFactory:
 
     def __init__(self):
+        import parserian.proxy_rotation_strategy as proxy_strategy
         self.proxies: typing.List[Proxy] = []
         self.index = 0
         self.lock = threading.RLock()

@@ -23,7 +23,7 @@ class UserAgentRoller:
 
     def fetch(self):
         res = requests.get("https://www.useragentstring.com/pages/Browserlist/")
-        soup = BeautifulSoup(res.text)
+        soup = BeautifulSoup(res.text, "html.parser")
         res = soup.select("li a")
         for k in res:
             self.add(k.text)

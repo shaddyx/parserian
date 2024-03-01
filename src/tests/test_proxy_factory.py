@@ -13,11 +13,11 @@ def test_add_then_next():
     f.add(Proxy("http://1.1.1.1"))
     f.add(Proxy("http://2.2.2.2"))
     with f.next() as p:
-        assert p.url == "http://1.1.1.1"
+        assert p.url == "http://1.1.1.1:80"
     with f.next() as p:
-        assert p.url == "http://2.2.2.2"
+        assert p.url == "http://2.2.2.2:80"
     with f.next() as p:
-        assert p.url == "http://1.1.1.1"
+        assert p.url == "http://1.1.1.1:80"
 
 
 def test_round_robin_with_tracking():
@@ -27,14 +27,14 @@ def test_round_robin_with_tracking():
     f.add(Proxy("http://2.2.2.2"))
 
     with f.next() as p:
-        assert p.url == "http://1.1.1.1"
+        assert p.url == "http://1.1.1.1:80"
     with f.next() as p:
-        assert p.url == "http://2.2.2.2"
+        assert p.url == "http://2.2.2.2:80"
     time.sleep(0.1)
     with f.next() as p:
-        assert p.url == "http://1.1.1.1"
+        assert p.url == "http://1.1.1.1:80"
     with f.next() as p:
-        assert p.url == "http://2.2.2.2"
+        assert p.url == "http://2.2.2.2:80"
     try:
         with f.next() as p:
             assert False, "Should be an error"
@@ -48,12 +48,12 @@ def test_delete():
     f.add(Proxy("http://2.2.2.2"))
     try:
         with f.next() as p:
-            assert p.url == "http://1.1.1.1"
+            assert p.url == "http://1.1.1.1:80"
             raise Exception("test")
     except:
         pass
     with f.next():
-        assert f.proxies[0].url == "http://2.2.2.2"
+        assert f.proxies[0].url == "http://2.2.2.2:80"
 
 
 def test_load_from_file():
@@ -75,7 +75,7 @@ def test_random_strategy():
     elements = []
     for i in range(100):
         with f.next() as p:
-            assert p.url in ["http://1.1.1.1", "http://2.2.2.2", "http://3.3.3.3"]
+            assert p.url in ["http://1.1.1.1:80", "http://2.2.2.2:80", "http://3.3.3.3:80"]
             if last is not None:
                 if last != p.url:
                     found = True
@@ -92,9 +92,9 @@ def test_random_strategy_cooldown():
     f.add(Proxy("http://1.1.1.1"))
     f.add(Proxy("http://2.2.2.2"))
     with f.next() as p:
-        assert p.url in ["http://1.1.1.1", "http://2.2.2.2"]
+        assert p.url in ["http://1.1.1.1:80", "http://2.2.2.2:80"]
     with f.next() as p:
-        assert p.url in ["http://1.1.1.1", "http://2.2.2.2"]
+        assert p.url in ["http://1.1.1.1:80", "http://2.2.2.2:80"]
 
     try:
         with f.next() as p:

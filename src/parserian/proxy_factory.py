@@ -34,10 +34,17 @@ class ProxyFactory:
             for proxy in self.proxies:
                 f.write("{}\n".format(proxy.url))
 
-    def add(self, proxy: Proxy):
+    def add(self, proxy: typing.Union[Proxy, str, typing.List[typing.Union[Proxy, str]]]):
         with self.lock:
-            self.proxies.append(proxy)
-            proxy.attach(self)
+            if isinstance(proxy, Proxy):
+                self.proxies.append(proxy)
+                proxy.attach(self)
+            elif isinstance(proxy, str):
+                self.proxies.append(Proxy(proxy))
+                self.proxies[-1].attach(self)
+            elif isinstance(proxy, list):
+                for p in proxy:
+                    self.add(p)
 
     def next(self):
         """

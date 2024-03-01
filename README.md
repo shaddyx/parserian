@@ -12,11 +12,11 @@ Example usage:
     f.add(proxy.Proxy("http://1.1.1.1"))
     f.add(proxy.Proxy("http://2.2.2.2"))
     with f.next() as p:
-        assert p.url == "http://1.1.1.1"
+        assert p.url == "http://1.1.1.1:80"
     with f.next() as p:
-        assert p.url == "http://2.2.2.2"
+        assert p.url == "http://2.2.2.2:80"
     with f.next() as p:
-        assert p.url == "http://1.1.1.1"
+        assert p.url == "http://1.1.1.1:80"
 ```
 
 The code will automatically delete incorrect proxy from the list if some error happened 
@@ -31,10 +31,10 @@ The code will automatically delete incorrect proxy from the list if some error h
     f.add(proxy.Proxy("http://2.2.2.2"))
     try:
         with f.next() as p:
-            assert p.url == "http://1.1.1.1"
+            assert p.url == "http://1.1.1.1:80"
             raise Exception("test")
     except:
         pass
     with f.next():
-        assert f.proxies[0].url == "http://2.2.2.2"
+        assert f.proxies[0].url == "http://2.2.2.2:80"
 ```

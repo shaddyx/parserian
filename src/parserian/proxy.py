@@ -23,6 +23,9 @@ def _parse_url(url: str):
         raise Exception("Failed to parse url: {}".format(url)) from e
 
 
+_lock = threading.RLock()
+
+
 class Proxy:
     def __init__(self, url):
         parsed = _parse_url(url)
@@ -36,7 +39,6 @@ class Proxy:
         self.last_used_time = 0
         self.acquired = False
         self.last_error_time = 0
-        self.lock = threading.RLock()
         self.factory = None
 
     @property
@@ -63,11 +65,11 @@ class Proxy:
         self.factory = factory
 
     def success(self):
-        with self.lock:
+        with _lock:
             self.success_count += 1
 
     def fail(self):
-        with self.lock:
+        with _lock:
             self.failed_count += 1
 
     def should_be_deleted(self):

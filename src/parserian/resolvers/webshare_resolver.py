@@ -2,11 +2,9 @@ import os
 import typing
 
 import webshare
-from webshare.util import Proxy
-import parserian.proxy as proxy
 
 
-def resolve(api_key: typing.Optional[str] = None) -> typing.List[Proxy]:
+def resolve(api_key: typing.Optional[str] = None) -> typing.List[str]:
     if api_key is None:
         api_key = os.environ.get("WEBSHARE_API_KEY")
 
@@ -16,7 +14,7 @@ def resolve(api_key: typing.Optional[str] = None) -> typing.List[Proxy]:
     api_client = webshare.webshare.ApiClient(api_key)
     proxies = api_client.get_proxy_list()
 
-    return [proxy.Proxy(f"http://{p.username}:{p.password}@{p.proxy_address}:{p.port}") for p in proxies.get_results()]
+    return [f"http://{p.username}:{p.password}@{p.proxy_address}:{p.port}" for p in proxies.get_results()]
 
 
 if __name__ == "__main__":

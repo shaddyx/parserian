@@ -40,8 +40,7 @@ class ProxyFactory:
                 self.proxies.append(proxy)
                 proxy.attach(self)
             elif isinstance(proxy, str):
-                self.proxies.append(Proxy(proxy))
-                self.proxies[-1].attach(self)
+                self.add(Proxy(proxy))
             elif isinstance(proxy, list):
                 for p in proxy:
                     self.add(p)

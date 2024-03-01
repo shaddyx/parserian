@@ -46,6 +46,17 @@ class Proxy:
         else:
             return "{}://{}:{}@{}:{}".format(self.protocol, self.username, self.password, self.host, self.port)
 
+    def playwright_proxy(self):
+        if self.username is None:
+            return {
+                "server": "{}://{}:{}".format(self.protocol, self.host, self.port)
+            }
+        return {
+            "server": "{}://{}:{}".format(self.protocol, self.host, self.port),
+            "username": self.username,
+            "password": self.password
+        }
+
     def attach(self, factory):
         if self.factory is not None:
             raise Exception("proxy already attached")

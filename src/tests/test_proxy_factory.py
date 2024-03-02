@@ -20,6 +20,13 @@ def test_add_then_next():
         assert p.url == "http://1.1.1.1:80"
 
 
+def test_add_the_same():
+    f = ProxyFactory()
+    f.add(Proxy("http://1.1.1.1"))
+    f.add(Proxy("http://1.1.1.1"))
+    assert len(f.proxies) == 1
+
+
 def test_round_robin_with_tracking():
     f = ProxyFactory()
     f.strategy = proxy_strategy.RoundRobinProxyStrategy(track_usage=True, cool_down=0.1)

@@ -87,6 +87,9 @@ class Proxy:
     def __repr__(self):
         return self.__str__()
 
+    def key(self):
+        return f"{self.protocol}://{self.host}:{self.port}"
+
 
 class HttpProxy(Proxy):
     pass

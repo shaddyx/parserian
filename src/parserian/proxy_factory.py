@@ -10,9 +10,29 @@ class ProxyFactory:
     def __init__(self):
         import parserian.proxy_rotation_strategy as proxy_strategy
         self.proxies: typing.List[Proxy] = []
+        self.proxy_map = {}
         self.index = 0
         self.lock = threading.RLock()
         self.strategy = proxy_strategy.RoundRobinProxyStrategy()
+
+    def _do_remove(self, proxy):
+        with self.lock:
+            self.proxies.remove(proxy)
+            self.proxy_map.pop(proxy.key())
+
+    def _do_append_or_update(self, proxy):
+        with self.lock:
+            if proxy.key() in self.proxy_map:
+                self._do_remove(self.proxy_map[proxy.key()])
+
+            self.proxies.append(proxy)
+            self.proxy_map[proxy.key()] = proxy
+            proxy.attach(self)
+
+    def clean(self):
+        with self.lock:
+            self.proxies = []
+            self.proxy_map = {}
 
     def load_from_file(self, filename):
         """
@@ -37,8 +57,7 @@ class ProxyFactory:
     def add(self, proxy: typing.Union[Proxy, str, typing.List[typing.Union[Proxy, str]]]):
         with self.lock:
             if isinstance(proxy, Proxy):
-                self.proxies.append(proxy)
-                proxy.attach(self)
+                self._do_append_or_update(proxy)
             elif isinstance(proxy, str):
                 self.add(Proxy(proxy))
             elif isinstance(proxy, list):
@@ -66,4 +85,8 @@ class ProxyFactory:
             else:
                 proxy.failed_count += 1
                 if proxy.should_be_deleted():
-                    self.proxies.remove(proxy)
+                    self._do_remove(proxy)
+
+
+
+

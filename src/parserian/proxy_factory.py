@@ -1,3 +1,4 @@
+import os
 import threading
 import time
 import typing
@@ -34,7 +35,7 @@ class ProxyFactory:
             self.proxies = []
             self.proxy_map = {}
 
-    def load_from_file(self, filename):
+    def load_from_file(self, filename, fail_if_not_found=True):
         """
         Loads a list of proxies from a file in the next format:
 
@@ -42,9 +43,12 @@ class ProxyFactory:
 
         example: http://1.1.1.1:8080
 
+        :param fail_if_not_found: if set to False will not raise an exception if the file is not found
         :param filename:
         :return:
         """
+        if not fail_if_not_found and not os.path.exists(filename):
+            return
         with open(filename, "r") as f:
             for line in f:
                 self.add(Proxy(line.strip()))
